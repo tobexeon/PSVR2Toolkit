@@ -12,6 +12,7 @@
 #define STEAMVR_SETTINGS_DISABLE_GAZE "disableGaze"
 #define STEAMVR_SETTINGS_USE_TOOLKIT_SYNC "useToolkitSync"
 #define STEAMVR_SETTINGS_USE_ENHANCED_HAPTICS "useEnhancedHaptics"
+#define STEAMVR_SETTINGS_HAPTICS_GAIN_EXPONENT "hapticsGainExponent"
 
 #define SETTING_ENABLE_EYELID_ESTIMATION_DEFAULT_VALUE false
 #define SETTING_DISABLE_CHAPERONE_DEFAULT_VALUE false
@@ -21,6 +22,7 @@
 #define SETTING_DISABLE_GAZE_DEFAULT_VALUE false
 #define SETTING_USE_TOOLKIT_SYNC_DEFAULT_VALUE true
 #define SETTING_USE_ENHANCED_HAPTICS_DEFAULT_VALUE true
+#define SETTING_HAPTICS_GAIN_EXPONENT_DEFAULT_VALUE 1.0f
 
 namespace psvr2_toolkit {
 
@@ -38,6 +40,15 @@ namespace psvr2_toolkit {
     static int GetInt32(const char *pchSettingsKey, int defaultValue) {
       vr::EVRSettingsError error;
       int value = vr::VRSettings()->GetInt32(STEAMVR_SETTINGS_SECTION_PLAYSTATION_VR2_EX, pchSettingsKey, &error);
+      if (error != vr::EVRSettingsError::VRSettingsError_None) {
+        value = defaultValue;
+      }
+      return value;
+    }
+
+    static float GetFloat(const char *pchSettingsKey, float defaultValue) {
+      vr::EVRSettingsError error;
+      float value = vr::VRSettings()->GetFloat(STEAMVR_SETTINGS_SECTION_PLAYSTATION_VR2_EX, pchSettingsKey, &error);
       if (error != vr::EVRSettingsError::VRSettingsError_None) {
         value = defaultValue;
       }

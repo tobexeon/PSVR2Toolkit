@@ -3,6 +3,7 @@
 #include "math_helpers.h"
 #include "sense_controller.h"
 #include "sense_crc.h"
+#include "vr_settings.h"
 
 #include <iostream>
 #include <iomanip>
@@ -193,6 +194,14 @@ void SenseController::SendToDevice() {
       }
     }
 
+    float gainExponent = VRSettings::GetFloat(STEAMVR_SETTINGS_HAPTICS_GAIN_EXPONENT, SETTING_HAPTICS_GAIN_EXPONENT_DEFAULT_VALUE);
+
+    if (std::abs(gainExponent - 1.0f) > 0.001f) {
+        for (int i = 0; i < 32; i++) {
+            buffer.hapticPCM[i] = ApplyExponentialGain(buffer.hapticPCM[i], gainExponent);
+        }
+    }
+  
     buffer.settings.timeStampMicrosecondsLastSend = static_cast<uint32_t>(GetHostTimestamp());
 
     *crc = CalculateSenseCRC32(&buffer, sizeof(buffer) - sizeof(buffer.crc));

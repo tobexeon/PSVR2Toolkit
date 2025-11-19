@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <corecrt_math.h>
 #include <corecrt_math_defines.h>
+#include <cmath>
 #include <set>
 #include <stdexcept>
 
@@ -24,6 +25,27 @@ namespace psvr2_toolkit {
             return INT8_MIN;
         else
             return static_cast<int8_t>(result);
+    }
+
+    static int8_t ApplyExponentialGain(int8_t sample, float exponent)
+    {
+        if (std::abs(exponent - 1.0f) < 0.001f || sample == 0) {
+            return sample;
+        }
+
+        float normalized = std::abs(static_cast<float>(sample)) / 127.0f;
+        
+        if (normalized > 1.0f) normalized = 1.0f;
+
+        float curved = std::pow(normalized, exponent);
+
+        float result = curved * 127.0f;
+        
+        if (sample < 0) {
+            result = -result;
+        }
+        
+        return static_cast<int8_t>(Clamp(result, -128.0, 127.0));
     }
 
     static int8_t CosineToByte(uint32_t position, double max, double amp, double overdrive)
